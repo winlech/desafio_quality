@@ -1,16 +1,14 @@
 package br.com.mercadolivre.desafio_quality;
 
-import br.com.mercadolivre.desafio_quality.entities.Place;
+import br.com.mercadolivre.desafio_quality.entities.District;
+import br.com.mercadolivre.desafio_quality.entities.Property;
 import br.com.mercadolivre.desafio_quality.entities.Room;
 import br.com.mercadolivre.desafio_quality.entities.RoomWithTotal;
-import br.com.mercadolivre.desafio_quality.services.CalculatePlaceValueService;
-import br.com.mercadolivre.desafio_quality.services.CalculateRoomTotalSquareMeterService;
-import br.com.mercadolivre.desafio_quality.services.CalculateTotalSquareMeterService;
-import br.com.mercadolivre.desafio_quality.services.GetBiggestRoomService;
+import br.com.mercadolivre.desafio_quality.repositories.DistrictRepository;
+import br.com.mercadolivre.desafio_quality.services.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
@@ -18,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class DesafioQualityApplicationTests {
@@ -28,8 +25,9 @@ class DesafioQualityApplicationTests {
     private CalculatePlaceValueService calculatePlaceValueService;
     private GetBiggestRoomService getBiggestRoomService;
     private CalculateRoomTotalSquareMeterService calculateRoomTotalSquareMeterService;
+    DistrictRepository districtRepository;
     private List<Room> rooms;
-    private Place place;
+    private Property property;
     private Room biggestRoom;
 
     @BeforeEach
@@ -38,12 +36,13 @@ class DesafioQualityApplicationTests {
         calculatePlaceValueService = new CalculatePlaceValueService();
         getBiggestRoomService = new GetBiggestRoomService();
         calculateRoomTotalSquareMeterService = new CalculateRoomTotalSquareMeterService();
+        districtRepository = new DistrictRepository();
         biggestRoom = new Room("quarto", 2.5, 3.8);
         rooms = Stream.of(
                 biggestRoom,
                 new Room("cozinha", 1.2, 2.0)
         ).collect(Collectors.toList());
-        place = new Place("Bellagio", "Lapa", new BigDecimal(5), rooms);
+        property = new Property("Bellagio", "Lapa", rooms);
 
     }
 
@@ -63,7 +62,8 @@ class DesafioQualityApplicationTests {
         BigDecimal expectedResult = new BigDecimal(expectedValue);
 
         double totalMeter = calculateTotalSquareMeterService.execute(rooms);
-        BigDecimal result = calculatePlaceValueService.execute(place, totalMeter);
+        District district = new District("Lapa", new BigDecimal(5));
+        BigDecimal result = calculatePlaceValueService.execute(district, totalMeter);
 
         assertEquals(expectedResult, result);
     }
@@ -85,7 +85,32 @@ class DesafioQualityApplicationTests {
         List<RoomWithTotal> result = calculateRoomTotalSquareMeterService.execute(rooms);
 
         assertEquals(expectedResult, result);
+    }
 
+    @Test
+    @DisplayName("District exists so return true")
+    void shouldVerifyIfDistrictExists() {
+        VerifyDistrictService verifyDistrictService = new VerifyDistrictService(districtRepository);
+
+        boolean result = verifyDistrictService.execute(property.getProp_district());
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("District do not exists so throw exception")
+    void shouldThrowException() {
+
+        VerifyDistrictService verifyDistrictService = new VerifyDistrictService(districtRepository);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            verifyDistrictService.execute("Não existe");
+        });
+
+        String expecteMessage = "Bairro não existe";
+        String actualMessage = exception.getMessage();
+
+        assertEquals(expecteMessage, actualMessage);
     }
 
 }
