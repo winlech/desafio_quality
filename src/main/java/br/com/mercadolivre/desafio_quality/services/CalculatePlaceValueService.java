@@ -1,7 +1,6 @@
 package br.com.mercadolivre.desafio_quality.services;
 
 import br.com.mercadolivre.desafio_quality.entities.District;
-import br.com.mercadolivre.desafio_quality.entities.Property;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
