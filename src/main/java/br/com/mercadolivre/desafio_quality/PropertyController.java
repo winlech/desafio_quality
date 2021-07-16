@@ -7,11 +7,11 @@ import br.com.mercadolivre.desafio_quality.entities.Room;
 import br.com.mercadolivre.desafio_quality.entities.RoomWithTotal;
 import br.com.mercadolivre.desafio_quality.repositories.DistrictRepository;
 import br.com.mercadolivre.desafio_quality.services.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/property")
+@Api(value = "API REST Property")
+@CrossOrigin(origins = "*")
 public class PropertyController {
 
     private final CalculatePlaceValueService calculatePlaceValueService;
@@ -40,6 +43,7 @@ public class PropertyController {
     }
 
     @PostMapping("/calculateTotalArea")
+    @ApiOperation(value = "Calcula o total de metros quadrados de uma propriedade")
     public ResponseEntity<Map> calculateTotalArea(@Valid @RequestBody PropertyDTO propertyDTO) {
         Property property = propertyDTO.convert();
         double totalSquareMeterProperty = calculateTotalSquareMeterService.execute(property.getRooms());
@@ -49,6 +53,7 @@ public class PropertyController {
     }
 
     @PostMapping("/calculatePropertyValue")
+    @ApiOperation(value = "Indica o valor de uma propriedade com base em seus cômodos e medidas.")
     public ResponseEntity<Map> calculatePropertyValue(@Valid @RequestBody PropertyDTO propertyDTO) {
         Property property = propertyDTO.convert();
         District district;
@@ -65,6 +70,7 @@ public class PropertyController {
     }
 
     @PostMapping("/biggerRoom")
+    @ApiOperation(value = "Determine qual é o maior cômodo.")
     public ResponseEntity<Room> biggerRoom(@Valid @RequestBody PropertyDTO propertyDTO) {
         Property property = propertyDTO.convert();
         Room rooms = getBiggestRoomService.execute(property.getRooms());
@@ -73,6 +79,7 @@ public class PropertyController {
     }
 
     @PostMapping("/roomsWithTotal")
+    @ApiOperation(value = "Determina a quantidade de metros quadrados que tem cada cômodo de uma propriedade.")
     public ResponseEntity<List<RoomWithTotal>> roomsWithTotal(@Valid @RequestBody PropertyDTO propertyDTO) {
         Property property = propertyDTO.convert();
         List<RoomWithTotal> rooms = calculateRoomTotalSquareMeterService.execute(property.getRooms());

@@ -15,7 +15,7 @@ public class PropertyDTO {
     @NotBlank(message = "Campo prop_name não pode estar vazio")
     @NotNull(message = "Campo prop_name não pode estar vazio")
     @Size(max = 30, message = "Comprimento do prop_name não pode exceder 30 caracters")
-    @Pattern(regexp = "\\b[A-Z]\\w*\\b", message = "O prop_name deve começar com uma letra maíuscula")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9_ ]*$", message = "O prop_name deve começar com uma letra maíuscula")
     private String prop_name;
 
     @NotBlank(message = "Campo prop_district não pode estar vazio")

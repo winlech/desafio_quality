@@ -9,7 +9,7 @@ public class RoomDTO {
     @NotBlank(message = "Campo room_name não pode estar vazio")
     @NotNull(message = "Campo room_name não pode estar vazio")
     @Size(max = 30, message = "Comprimento do room_name não pode exceder 30 caracters")
-    @Pattern(regexp = "\\\\b[A-Z]\\\\w*\\\\b", message = "O room_name deve começar com uma letra maíuscula")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9_ ]*$", message = "O room_name deve começar com uma letra maíuscula")
     private String room_name;
 
     @NotBlank(message = "Campo room_width não pode estar vazio")
